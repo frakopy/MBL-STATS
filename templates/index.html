@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB STATS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='imgs/favicon.png')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Welcome To MLB Stats</h1>
+        </div>
+    </header>
+    <div class="select-date">
+        <label for="input-date">Please Select a Date:</label>
+        <input name="input-date" id="input-date" type="date" value="">
+    </div>
+    <div class="tables">
+        <!-- Table for the Games are schedduled -->
+        <table border="" class="table-heads" id="table-games-headers">
+            <tr>
+                <th>TEAM_1</th>
+                <th>VS</th>
+                <th>TEAM_2</th>
+                <th>PITCHING MATCHUP</th>
+            </tr>
+        </table>
+        <table border="" class="table-games" id="table-games">
+            <tbody id="tbody-table-games">
+            </tbody>
+        </table>
+
+        <!-- Table for the Games that has been played-->
+        <table border="" class="table-results hide" id="tbl-games-played">
+            <tr>
+                <th>TEAM_1</th>
+                <th>TEAM_2</th>
+                <th>RESULT</th>
+                <th>WIN</th>
+                <th>LOSS</th>
+            </tr>
+            <tbody id="tbody-games-results">
+            </tbody>
+        </table>
+
+        <!-- Container for tables statistics abourt pithers vs batters-->
+        <div class="stats-container" id="stats-results">
+        </div>    
+    </div>
+
+    <!-- This div is used for show a loading animation while the tables stats are not ready yet-->
+    <div class="animation-loading hide" id="animation">
+        <span style="font-size:30px; color: #FF4C29; margin-right: 10px;">Getting Stats</span>
+        <i class="fa fa-cog fa-spin" style="font-size:50px; color: #FFD700"></i>
+    </div>
+
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="{{url_for('static', filename='js/script.js')}}"></script>
+</body>
+</html>
