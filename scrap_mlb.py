@@ -31,7 +31,7 @@ class mlb():
 
         self.len = len(self.divs_team1)
         self.dic_games = {}
-        # self.url_stats = []
+        self.url_stats.clear()#Cleaning the previous data in the list self.url_stats
 
         j = 0 #for iterate tds elements
         for i in range(self.len):
@@ -97,7 +97,6 @@ class mlb():
         return self.dic_games
 
     def get_games(self, date):        
-
         self.url_games = f'https://www.espn.com/mlb/schedule/_/date/{date}'
         self.games = requests.get(self.url_games, headers={'User-Agent': 'Mozilla/5.0'}) #For avoid HTPP Erro 403 Forbidden we use headers parameter
         self.soup_games =  BeautifulSoup(self.games.text, 'html.parser')
@@ -108,7 +107,7 @@ class mlb():
 
         self.len = len(self.divs_team1)
         self.dic_games = {}
-        # self.url_stats = []
+        self.url_stats.clear() #Cleaning the previous data in the list self.url_stats
 
         for i in range(self.len):
             self.list_data_game = []
@@ -169,7 +168,6 @@ class mlb():
         # self.url_stats = 'https://www.espn.com/mlb/player/batvspitch/_/id/41233/teamId/2'
 
         self.dic_stats = {}
-
         for url in self.url_stats:
             try:
                 self.req_sts = Request(url, headers={'User-Agent': 'Mozilla/5.0'}) #For avoid HTPP Erro 403 Forbidden we use headers parameter
@@ -187,17 +185,21 @@ class mlb():
                 pass
 
         #Removing all items from the list for avoid to combine data in the next call to this function
-        self.url_stats.clear() 
+        self.url_stats.clear()
         return self.dic_stats
     
 
 if __name__ == '__main__':
-    mlb1 =  mlb()
+    pass
+    # mlb1 =  mlb()
 
     # date =  datetime.datetime.now().strftime('%Y%m%d')
-    games = mlb1.get_games_results('20220422') #20220527 20220423
-    for game in games:
-        print(games[game])
+    # games = mlb1.get_games('20220428') #20220527 20220423
+    # for game in games:
+    #     print(games[game])
+
+    # print('The URLS list for the statistics are bellow:')
+    # print(mlb1.url_stats)
     
     # urls = ['https://www.espn.com/mlb/player/batvspitch/_/id/40921/david-peterson']
 
