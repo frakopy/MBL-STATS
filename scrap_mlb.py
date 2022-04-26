@@ -197,6 +197,8 @@ class mlb():
         # self.url_stats = 'https://www.espn.com/mlb/player/batvspitch/_/id/41233/teamId/2'
 
         self.dic_stats = {}
+        self.dic_stats['URLS'] = self.url_stats
+
         for url in self.url_stats:
             try:
                 self.req_sts = Request(url, headers={'User-Agent': 'Mozilla/5.0'}) #For avoid HTPP Erro 403 Forbidden we use headers parameter
@@ -211,14 +213,13 @@ class mlb():
 
                 self.dic_stats[self.title] = self.html_table
             except Exception as e:
-                self.dic_stats['Error'] = e
+                self.dic_stats['Error'] = str(e)
 
         #Removing all items from the list for avoid to combine data in the next call to this function
         self.url_stats.clear()
 
         if not self.dic_stats:
             self.dic_stats['Vacio'] = 'Vacio'
-            self.dic_stats['URLS'] = self.url_stats
 
         return self.dic_stats
     

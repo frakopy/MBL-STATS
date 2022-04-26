@@ -25,6 +25,7 @@ def get_games():
 @app.route('/get_stats', methods=['GET']) 
 def get_stats():
     dic_stats = MLB.get_stats()
+    print(dic_stats)
     return jsonify(dic_stats)
 
 
