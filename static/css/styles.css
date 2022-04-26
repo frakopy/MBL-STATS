@@ -202,7 +202,7 @@ header{
         margin-top: 10px;
     }
 
-    /* Table Games */
+    /*---------------- Table Games --------------------*/
     .tables{
         margin-top: 40px;
     }
@@ -236,7 +236,22 @@ header{
     }
 
 
-    /* Tables satistics */
+    /*---------------- Table Games that has been played --------------------*/
+
+    .tables .table-results th {
+        font-size: 12px;
+    }
+    .tables .table-results td {
+        font-size: 10px;
+    }
+    
+    .table-results th, .table-results td {
+        width: 100px;
+        padding: 5px;
+    }
+
+
+    /*------------- Tables satistics ------------------------*/
 
     .stats-container h2 {
         font-size: 15px;
