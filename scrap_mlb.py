@@ -56,8 +56,8 @@ class mlb():
                 result = self.tds[j].find('a').text
                 self.list_data_game.append(result)
 
-                win = self.tds[j + 1].find('a').text
-                loss = self.tds[j + 2].find('a').text
+                win = self.tds[j + 1].find('a')
+                loss = self.tds[j + 2].find('a')
 
                 if win == None and loss == None:
                     loss ,win = '', ''
@@ -68,18 +68,18 @@ class mlb():
                 elif win == None:
                     win = ''
                     self.list_data_game.append(win)
-                    self.list_data_game.append(loss)
+                    self.list_data_game.append(loss.text)
                     self.dic_games[f'Game_{i}'] = self.list_data_game
                 
                 elif loss == None:
                     loss = ''
-                    self.list_data_game.append(win)
+                    self.list_data_game.append(win.text)
                     self.list_data_game.append(loss)
                     self.dic_games[f'Game_{i}'] = self.list_data_game
                 
                 else:
-                    self.list_data_game.append(win)
-                    self.list_data_game.append(loss)
+                    self.list_data_game.append(win.text)
+                    self.list_data_game.append(loss.text)
                     self.dic_games[f'Game_{i}'] = self.list_data_game
 
                     id_pitch1 = self.tds[j + 1].find('a').get('href').split('/')[-1]
@@ -191,12 +191,12 @@ class mlb():
 
 if __name__ == '__main__':
     pass
-    # mlb1 =  mlb()
+    mlb1 =  mlb()
 
-    # date =  datetime.datetime.now().strftime('%Y%m%d')
-    # games = mlb1.get_games('20220428') #20220527 20220423
-    # for game in games:
-    #     print(games[game])
+    date =  datetime.datetime.now().strftime('%Y%m%d')
+    games = mlb1.get_games_results('20220405') #20220527 20220423
+    for game in games:
+        print(games[game])
 
     # print('The URLS list for the statistics are bellow:')
     # print(mlb1.url_stats)
