@@ -109,7 +109,7 @@ class mlb():
         self.dic_games = {}
         
         if table_games:
-            self.table = self.soup_games.find_all('table')[0] 
+            self.table = table_games[0] 
             self.divs_team1 = self.table.find_all('div', attrs={'class': 'matchTeams'})
             self.divs_team2 = self.table.find_all('div', attrs={'class': 'local'})
             self.td_pitchs = self.table.find_all('td', attrs={'class': 'probable__col Table__TD'})
@@ -138,17 +138,29 @@ class mlb():
                     tag_span = tag_p.find('span')
 
                     if len(tags_a) < 2: #If only found one tag 'a'
-                        
+
                         spans = tag_p.find_all('span')
                         
                         if spans[0].text == 'Undecided':
                             pitch_match = spans[0].text + ' vs ' + tags_a[0].text
                             self.list_data_game.append(pitch_match)
+
+                            id_team1 = self.dic_team_name_id[team1]
+                            id_pitch2 = tags_a[0].get('href').split('/')[-1]
+
+                            url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
+                            self.url_stats.append(url_pitch2_stats)
                         
                         elif spans[1].text == 'Undecided':
                             pitch_match =  tags_a[0].text + ' vs ' + spans[1].text
                             self.list_data_game.append(pitch_match)
 
+                            id_team2 = self.dic_team_name_id[team2]
+                            id_pitch1 = tags_a[0].get('href').split('/')[-1]
+
+                            url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch1}/teamId/{id_team2}'
+                            self.url_stats.append(url_pitch2_stats)
+                        
                         self.dic_games[f'Game_{i}'] = self.list_data_game
                     
                     else: #It means that we found 2 tags 'a'
@@ -199,10 +211,14 @@ class mlb():
 
                 self.dic_stats[self.title] = self.html_table
             except:
-                pass
+                continue
 
         #Removing all items from the list for avoid to combine data in the next call to this function
         self.url_stats.clear()
+
+        if not self.dic_stats:
+            self.dic_stats = {'Vacio': 'Vacio'}
+
         return self.dic_stats
     
 
