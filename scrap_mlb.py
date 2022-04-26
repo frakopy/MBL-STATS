@@ -138,8 +138,17 @@ class mlb():
                     tag_span = tag_p.find('span')
 
                     if len(tags_a) < 2: #If only found one tag 'a'
-                        pitch_match = tags_a[0].text + ' vs ' +tag_span.text
-                        self.list_data_game.append(pitch_match)
+                        
+                        spans = tag_p.find_all('span')
+                        
+                        if spans[0].text == 'Undecided':
+                            pitch_match = spans[0].text + ' vs ' + tags_a[0].text
+                            self.list_data_game.append(pitch_match)
+                        
+                        elif spans[1].text == 'Undecided':
+                            pitch_match =  tags_a[0].text + ' vs ' + spans[1].text
+                            self.list_data_game.append(pitch_match)
+
                         self.dic_games[f'Game_{i}'] = self.list_data_game
                     
                     else: #It means that we found 2 tags 'a'
