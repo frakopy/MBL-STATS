@@ -21,6 +21,7 @@ const tbodyGamesResults = document.getElementById('tbody-games-results')
 
 //-------------------- Displaying the statistics in the web page ----------------------------------
 function showStats (sts) {
+    console.log(sts)
     const fragment = document.createDocumentFragment()
     for(key in sts) {
         const h2 =  document.createElement('h2')
