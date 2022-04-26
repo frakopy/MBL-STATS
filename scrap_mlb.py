@@ -24,75 +24,79 @@ class mlb():
         self.url_games = f'https://www.espn.com/mlb/schedule/_/date/{date}'
         self.games = requests.get(self.url_games, headers={'User-Agent': 'Mozilla/5.0'}) #For avoid HTPP Erro 403 Forbidden we use headers parameter
         self.soup_games =  BeautifulSoup(self.games.text, 'html.parser')
-        self.table = self.soup_games.find_all('table')[0] 
-        self.divs_team1 = self.table.find_all('div', attrs={'class': 'matchTeams'})
-        self.divs_team2 = self.table.find_all('div', attrs={'class': 'local'})
-        self.tds = self.table.find_all('td', attrs={'class': 'teams__col Table__TD'})
 
-        self.len = len(self.divs_team1)
+        tables_games_results = self.soup_games.find_all('table')
         self.dic_games = {}
-        self.url_stats.clear()#Cleaning the previous data in the list self.url_stats
 
-        j = 0 #for iterate tds elements
-        for i in range(self.len):
-            self.list_data_game = []
+        if tables_games_results:
+            self.table = self.soup_games.find_all('table')[0] 
+            self.divs_team1 = self.table.find_all('div', attrs={'class': 'matchTeams'})
+            self.divs_team2 = self.table.find_all('div', attrs={'class': 'local'})
+            self.tds = self.table.find_all('td', attrs={'class': 'teams__col Table__TD'})
 
-            team1 = self.divs_team1[i].find('a').get('href').split('/')[-1]
-            self.list_data_game.append(team1)
+            self.len = len(self.divs_team1)
+            self.url_stats.clear()#Cleaning the previous data in the list self.url_stats
 
-            team2 = self.divs_team2[i].find('a').get('href').split('/')[-1]
-            self.list_data_game.append(team2)
-            
-            game_result = self.tds[j].find('a').text
+            j = 0 #for iterate tds elements
+            for i in range(self.len):
+                self.list_data_game = []
 
-            if game_result == 'Postponed': 
-                result, win, loss = 'Postponed', '', ''
-                self.list_data_game.append(result)
-                self.list_data_game.append(win)
-                self.list_data_game.append(loss)
-                self.dic_games[f'Game_{i}'] = self.list_data_game
+                team1 = self.divs_team1[i].find('a').get('href').split('/')[-1]
+                self.list_data_game.append(team1)
 
-            else: 
-                result = self.tds[j].find('a').text
-                self.list_data_game.append(result)
+                team2 = self.divs_team2[i].find('a').get('href').split('/')[-1]
+                self.list_data_game.append(team2)
+                
+                game_result = self.tds[j].find('a').text
 
-                win = self.tds[j + 1].find('a')
-                loss = self.tds[j + 2].find('a')
-
-                if win == None and loss == None:
-                    loss ,win = '', ''
+                if game_result == 'Postponed': 
+                    result, win, loss = 'Postponed', '', ''
+                    self.list_data_game.append(result)
                     self.list_data_game.append(win)
                     self.list_data_game.append(loss)
                     self.dic_games[f'Game_{i}'] = self.list_data_game
 
-                elif win == None:
-                    win = ''
-                    self.list_data_game.append(win)
-                    self.list_data_game.append(loss.text)
-                    self.dic_games[f'Game_{i}'] = self.list_data_game
-                
-                elif loss == None:
-                    loss = ''
-                    self.list_data_game.append(win.text)
-                    self.list_data_game.append(loss)
-                    self.dic_games[f'Game_{i}'] = self.list_data_game
-                
-                else:
-                    self.list_data_game.append(win.text)
-                    self.list_data_game.append(loss.text)
-                    self.dic_games[f'Game_{i}'] = self.list_data_game
+                else: 
+                    result = self.tds[j].find('a').text
+                    self.list_data_game.append(result)
 
-                    id_pitch1 = self.tds[j + 1].find('a').get('href').split('/')[-1]
-                    id_team1 = self.dic_team_name_id[team1]
-                    id_pitch2 = self.tds[j + 2].find('a').get('href').split('/')[-1]
-                    id_team2 = self.dic_team_name_id[team2]
+                    win = self.tds[j + 1].find('a')
+                    loss = self.tds[j + 2].find('a')
+
+                    if win == None and loss == None:
+                        loss ,win = '', ''
+                        self.list_data_game.append(win)
+                        self.list_data_game.append(loss)
+                        self.dic_games[f'Game_{i}'] = self.list_data_game
+
+                    elif win == None:
+                        win = ''
+                        self.list_data_game.append(win)
+                        self.list_data_game.append(loss.text)
+                        self.dic_games[f'Game_{i}'] = self.list_data_game
                     
-                    url_pitch1_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch1}/teamId/{id_team2}'
-                    self.url_stats.append(url_pitch1_stats)
-                    url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
-                    self.url_stats.append(url_pitch2_stats)
+                    elif loss == None:
+                        loss = ''
+                        self.list_data_game.append(win.text)
+                        self.list_data_game.append(loss)
+                        self.dic_games[f'Game_{i}'] = self.list_data_game
+                    
+                    else:
+                        self.list_data_game.append(win.text)
+                        self.list_data_game.append(loss.text)
+                        self.dic_games[f'Game_{i}'] = self.list_data_game
 
-            j += 4 #For acces to the td that is in the next row of the table for next lap of the loop
+                        id_pitch1 = self.tds[j + 1].find('a').get('href').split('/')[-1]
+                        id_team1 = self.dic_team_name_id[team1]
+                        id_pitch2 = self.tds[j + 2].find('a').get('href').split('/')[-1]
+                        id_team2 = self.dic_team_name_id[team2]
+                        
+                        url_pitch1_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch1}/teamId/{id_team2}'
+                        self.url_stats.append(url_pitch1_stats)
+                        url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
+                        self.url_stats.append(url_pitch2_stats)
+
+                j += 4 #For acces to the td that is in the next row of the table for next lap of the loop
             
         return self.dic_games
 
@@ -100,55 +104,59 @@ class mlb():
         self.url_games = f'https://www.espn.com/mlb/schedule/_/date/{date}'
         self.games = requests.get(self.url_games, headers={'User-Agent': 'Mozilla/5.0'}) #For avoid HTPP Erro 403 Forbidden we use headers parameter
         self.soup_games =  BeautifulSoup(self.games.text, 'html.parser')
-        self.table = self.soup_games.find_all('table')[0] 
-        self.divs_team1 = self.table.find_all('div', attrs={'class': 'matchTeams'})
-        self.divs_team2 = self.table.find_all('div', attrs={'class': 'local'})
-        self.td_pitchs = self.table.find_all('td', attrs={'class': 'probable__col Table__TD'})
-
-        self.len = len(self.divs_team1)
+        
+        table_games = self.soup_games.find_all('table')
         self.dic_games = {}
-        self.url_stats.clear() #Cleaning the previous data in the list self.url_stats
+        
+        if table_games:
+            self.table = self.soup_games.find_all('table')[0] 
+            self.divs_team1 = self.table.find_all('div', attrs={'class': 'matchTeams'})
+            self.divs_team2 = self.table.find_all('div', attrs={'class': 'local'})
+            self.td_pitchs = self.table.find_all('td', attrs={'class': 'probable__col Table__TD'})
 
-        for i in range(self.len):
-            self.list_data_game = []
+            self.len = len(self.divs_team1)
+            self.url_stats.clear() #Cleaning the previous data in the list self.url_stats
 
-            team1 = self.divs_team1[i].find('a').get('href').split('/')[-1]
-            self.list_data_game.append(team1)
+            for i in range(self.len):
+                self.list_data_game = []
 
-            team2 = self.divs_team2[i].find('a').get('href').split('/')[-1]
-            self.list_data_game.append(team2)
-            
-            tag_p = self.td_pitchs[i].find('p')
+                team1 = self.divs_team1[i].find('a').get('href').split('/')[-1]
+                self.list_data_game.append(team1)
 
-            if tag_p == None: #This happen when there is not tag 'p' (inside tag p are tags 'a' and tag 'span')
-                pitch_match = ''
-                self.list_data_game.append(pitch_match)
-                self.dic_games[f'Game_{i}'] = self.list_data_game
-
-            else: #This means that we found a tag 'p' where are one or two tags 'a' and one tag 'span'
-                tags_a = tag_p.find_all('a')
-                tag_span = tag_p.find('span')
-
-                if len(tags_a) < 2: #If only found one tag 'a'
-                    pitch_match = tags_a[0].text + ' vs ' +tag_span.text
-                    self.list_data_game.append(pitch_match)
-                    self.dic_games[f'Game_{i}'] = self.list_data_game
+                team2 = self.divs_team2[i].find('a').get('href').split('/')[-1]
+                self.list_data_game.append(team2)
                 
-                else: #It means that we found 2 tags 'a'
-                    pitch_match = tags_a[0].text + tag_span.text + tags_a[1].text
-            
+                tag_p = self.td_pitchs[i].find('p')
+
+                if tag_p == None: #This happen when there is not tag 'p' (inside tag p are tags 'a' and tag 'span')
+                    pitch_match = ''
                     self.list_data_game.append(pitch_match)
                     self.dic_games[f'Game_{i}'] = self.list_data_game
 
-                    id_pitch1 = tags_a[0].get('href').split('/')[-1]
-                    id_team1 = self.dic_team_name_id[team1]
-                    id_pitch2 = tags_a[1].get('href').split('/')[-1]
-                    id_team2 = self.dic_team_name_id[team2]
+                else: #This means that we found a tag 'p' where are one or two tags 'a' and one tag 'span'
+                    tags_a = tag_p.find_all('a')
+                    tag_span = tag_p.find('span')
+
+                    if len(tags_a) < 2: #If only found one tag 'a'
+                        pitch_match = tags_a[0].text + ' vs ' +tag_span.text
+                        self.list_data_game.append(pitch_match)
+                        self.dic_games[f'Game_{i}'] = self.list_data_game
                     
-                    url_pitch1_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch1}/teamId/{id_team2}'
-                    self.url_stats.append(url_pitch1_stats)
-                    url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
-                    self.url_stats.append(url_pitch2_stats)
+                    else: #It means that we found 2 tags 'a'
+                        pitch_match = tags_a[0].text + tag_span.text + tags_a[1].text
+                
+                        self.list_data_game.append(pitch_match)
+                        self.dic_games[f'Game_{i}'] = self.list_data_game
+
+                        id_pitch1 = tags_a[0].get('href').split('/')[-1]
+                        id_team1 = self.dic_team_name_id[team1]
+                        id_pitch2 = tags_a[1].get('href').split('/')[-1]
+                        id_team2 = self.dic_team_name_id[team2]
+                        
+                        url_pitch1_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch1}/teamId/{id_team2}'
+                        self.url_stats.append(url_pitch1_stats)
+                        url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
+                        self.url_stats.append(url_pitch2_stats)
 
         return self.dic_games
 
@@ -194,9 +202,9 @@ if __name__ == '__main__':
     mlb1 =  mlb()
 
     date =  datetime.datetime.now().strftime('%Y%m%d')
-    games = mlb1.get_games_results('20220405') #20220527 20220423
-    for game in games:
-        print(games[game])
+    games = mlb1.get_games_results('20220201') #20220527 20220423
+    # for game in games:
+    #     print(games[game])
 
     # print('The URLS list for the statistics are bellow:')
     # print(mlb1.url_stats)
