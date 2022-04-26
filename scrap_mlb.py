@@ -31,7 +31,7 @@ class mlb():
 
         self.len = len(self.divs_team1)
         self.dic_games = {}
-        self.url_stats = []
+        # self.url_stats = []
 
         j = 0 #for iterate tds elements
         for i in range(self.len):
@@ -108,7 +108,7 @@ class mlb():
 
         self.len = len(self.divs_team1)
         self.dic_games = {}
-        self.url_stats = []
+        # self.url_stats = []
 
         for i in range(self.len):
             self.list_data_game = []
@@ -164,13 +164,13 @@ class mlb():
         
         return self.dic_team_name_id
 
-    def get_stats(self, urls):
+    def get_stats(self):
         #Bellow is an example url format that this function need to receive
         # self.url_stats = 'https://www.espn.com/mlb/player/batvspitch/_/id/41233/teamId/2'
 
         self.dic_stats = {}
 
-        for url in urls:
+        for url in self.url_stats:
             try:
                 self.req_sts = Request(url, headers={'User-Agent': 'Mozilla/5.0'}) #For avoid HTPP Erro 403 Forbidden we use headers parameter
                 self.webpage = urlopen(self.req_sts).read()
@@ -186,7 +186,8 @@ class mlb():
             except:
                 pass
 
-
+        #Removing all items from the list for avoid to combine data in the next call to this function
+        self.url_stats.clear() 
         return self.dic_stats
     
 
