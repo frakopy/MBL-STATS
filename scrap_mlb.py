@@ -210,14 +210,15 @@ class mlb():
                 self.title = self.soup_sts.find('div', attrs={'class': 'Table__Title'}).text
 
                 self.dic_stats[self.title] = self.html_table
-            except:
-                continue
+            except Exception as e:
+                self.dic_stats['Error'] = e
 
         #Removing all items from the list for avoid to combine data in the next call to this function
         self.url_stats.clear()
 
         if not self.dic_stats:
-            self.dic_stats = {'Vacio': 'Vacio'}
+            self.dic_stats['Vacio'] = 'Vacio'
+            self.dic_stats['URLS'] = self.url_stats
 
         return self.dic_stats
     
