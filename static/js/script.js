@@ -46,6 +46,7 @@ const getStats = async () => {
     try{
         const request = await fetch('/get_stats')
         const result = await request.json()
+        console.log(result)
         return result
     }catch(error){
         return error
