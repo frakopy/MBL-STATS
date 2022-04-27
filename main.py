@@ -22,10 +22,11 @@ def get_games():
     games = MLB.get_games(date)
     return jsonify(games)
 
-@app.route('/get_stats', methods=['GET']) 
+@app.route('/get_stats', methods=['GET', 'POST']) 
 def get_stats():
-    dic_stats = MLB.get_stats()
-    print(dic_stats)
+    data_recived = request.json
+    urls_sts = data_recived['urls_sts']
+    dic_stats = MLB.get_stats(urls_sts)
     return jsonify(dic_stats)
 
 

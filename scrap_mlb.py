@@ -9,7 +9,6 @@ from tabulate import tabulate
 class mlb():
 
     def __init__(self):
-        
         self.url_stats = []
         self.dic_team_name_id = {}
         
@@ -74,6 +73,10 @@ class mlb():
                         self.list_data_game.append(win)
                         self.list_data_game.append(loss.text)
                         self.dic_games[f'Game_{i}'] = self.list_data_game
+                        # id_pitch2 = self.tds[j + 2].find('a').get('href').split('/')[-1]
+                        # id_team1 = self.dic_team_name_id[team1]
+                        # url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
+                        # self.url_stats.append(url_pitch2_stats)
                     
                     elif loss == None:
                         loss = ''
@@ -179,6 +182,7 @@ class mlb():
                         url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
                         self.url_stats.append(url_pitch2_stats)
 
+        self.dic_games['urls_stats'] = self.url_stats
         return self.dic_games
 
     def create_dic_team_id(self):
@@ -192,14 +196,14 @@ class mlb():
         
         return self.dic_team_name_id
 
-    def get_stats(self):
+    def get_stats(self, url_stats):
         #Bellow is an example url format that this function need to receive
         # self.url_stats = 'https://www.espn.com/mlb/player/batvspitch/_/id/41233/teamId/2'
 
         self.dic_stats = {}
-        self.dic_stats['URLS'] = self.url_stats
 
-        for url in self.url_stats:
+        # for url in self.url_stats:
+        for url in url_stats:
             try:
                 self.req_sts = Request(url, headers={'User-Agent': 'Mozilla/5.0'}) #For avoid HTPP Erro 403 Forbidden we use headers parameter
                 self.webpage = urlopen(self.req_sts).read()
@@ -212,15 +216,11 @@ class mlb():
                 self.title = self.soup_sts.find('div', attrs={'class': 'Table__Title'}).text
 
                 self.dic_stats[self.title] = self.html_table
-            except Exception as e:
-                self.dic_stats['Error'] = str(e)
+            except:
+                continue
 
         #Removing all items from the list for avoid to combine data in the next call to this function
         self.url_stats.clear()
-
-        if not self.dic_stats:
-            self.dic_stats['Vacio'] = 'Vacio'
-
         return self.dic_stats
     
 

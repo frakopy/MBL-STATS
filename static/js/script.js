@@ -42,11 +42,17 @@ function showStats (sts) {
 }
 
 //-------------------- Sending get request to the backend for getting stats -------------------------
-const getStats = async () => {
+const getStats = async (urls_stats) => {
+
+    const fetchSettings = {
+        method : 'POST',
+        body: JSON.stringify({urls_sts: urls_stats}),
+        headers: {"content-type": "application/json; charset=UTF-8"}
+    }
+
     try{
-        const request = await fetch('/get_stats')
+        const request = await fetch('/get_stats', fetchSettings)
         const result = await request.json()
-        console.log(result)
         return result
     }catch(error){
         return error
@@ -61,46 +67,52 @@ function changeToUpperCase(str){
         const firstLetter = cad.charAt(0).toUpperCase()
         wordToUpperCase += firstLetter + cad.slice(1) + ' '
     }
-
     return wordToUpperCase
 }
 
 //------------------------- Displaying the Games schedules in the web page ------------------------------------
 function showGames (games) {
     const fragment = document.createDocumentFragment()
+    const urls_stats = games['urls_stats']
+    let team1, team2, pitchers
     for(key in games){
-        let [team1, team2, pitchers] = games[key]
-        const tr = document.createElement('tr')
-        
-        if(team1.includes('-')){
-            team1 = changeToUpperCase(team1)
-        }else{
-            const firstLetter = team1.charAt(0).toUpperCase()
-            team1 = firstLetter + team1.slice(1)
+        if(key !== 'urls_stats'){
+            [team1, team2, pitchers] = games[key]
+            const tr = document.createElement('tr')
+            if(team1.includes('-')){
+                team1 = changeToUpperCase(team1)
+            }else{
+                const firstLetter = team1.charAt(0).toUpperCase()
+                team1 = firstLetter + team1.slice(1)
+            }
+            
+            if(team2.includes('-')){
+                team2 = changeToUpperCase(team2)
+            }else{
+                const firstLetter = team1.charAt(0).toUpperCase()
+                team1 = firstLetter + team1.slice(1)
+            }
+    
+            tr.innerHTML = `
+                <td>${team1}</td>
+                <td><span>VS</span></td>
+                <td>${team2}</td>
+                <td>${pitchers}</td>
+            `
+            fragment.appendChild(tr)
         }
-        
-        if(team2.includes('-')){
-            team2 = changeToUpperCase(team2)
-        }else{
-            const firstLetter = team1.charAt(0).toUpperCase()
-            team1 = firstLetter + team1.slice(1)
-        }
-
-        tr.innerHTML = `
-            <td>${team1}</td>
-            <td><span>VS</span></td>
-            <td>${team2}</td>
-            <td>${pitchers}</td>
-        `
-        fragment.appendChild(tr)
     }
     tbodyTableGames.appendChild(fragment)
 
     //Initially this element has the class hide so toggle remove it for show the animation
     animation.classList.toggle('hide')
-    
+
     // calling the function that request to the backend for pitchersvsbatter stats
-    getStats().then(result => showStats(result))
+    getStats(urls_stats).then(result => showStats(result))
+
+    // setTimeout(() => { 
+    //     getStats().then(result => showStats(result))
+    // }, 50000) 
 }
 
 
