@@ -9,14 +9,28 @@ from tabulate import tabulate
 class mlb():
 
     def __init__(self):
-        self.dic_team_name_id = {}
-        
-        with open('team_id.txt', 'r') as file:
-            for line in file:
-                line = line.split(':')
-                self.team_name = line[0]
-                self.team_id = line[1].replace('\n', '')
-                self.dic_team_name_id[self.team_name] = self.team_id
+
+        self.dic_team_name_id = {
+                "arizona-diamondbacks":29,"atlanta-braves":15,"baltimore-orioles":1,"boston-red-sox":2,
+                "chicago-cubs":16,"chicago-white-sox":4,"cincinnati-reds":17,"cleveland-guardians":5,
+                "colorado-rockies":27,"detroit-tigers":6,"houston-astros":18,"kansas-city-royals":7,
+                "los-angeles-angels":3,"los-angeles-dodgers":19,"miami-marlins":28,"milwaukee-brewers":8,
+                "minnesota-twins":9,"new-york-mets":21,"new-york-yankees":10,"oakland-athletics":11,
+                "philadelphia-phillies":22,"pittsburgh-pirates":23,"san-diego-padres":25,"san-francisco-giants":26,
+                "seattle-mariners":12,"st-louis-cardinals":24,"tampa-bay-rays":30,"texas-rangers":13,"toronto-blue-jays":14,
+                "washington-nationals":20
+                }
+
+        self.dic_team_nikname = {
+                "ATL":"atlanta-braves","ARI":"arizona-diamondbacks","BAL":"baltimore-orioles","BOS":"boston-red-sox",
+                "CHC":"chicago-cubs","CHW":"chicago-white-sox","CIN":"cincinnati-reds","CLE":"cleveland-guardians",
+                "COL":"colorado-rockies","DET":"detroit-tigers","HOU":"houston-astros","KC":"kansas-city-royals",
+                "LAA":"los-angeles-angels","LAD":"los-angeles-dodgers","MIA":"miami-marlins","MIL":"milwaukee-brewers",
+                "MIN":"minnesota-twins","NYM":"new-york-mets","NYY":"new-york-yankees","OAK":"oakland-athletics",
+                "PHI":"philadelphia-phillies","PIT":"pittsburgh-pirates","SD":"san-diego-padres","SF":"san-francisco-giants",
+                "SEA":"seattle-mariners","STL":"st-louis-cardinals","TB":"tampa-bay-rays","TEX":"texas-rangers",
+                "TOR":"toronto-blue-jays","WSH":"washington-nationals"
+                }
 
     def get_games_results(self, date):
         self.url_games = f'https://www.espn.com/mlb/schedule/_/date/{date}'
@@ -25,6 +39,7 @@ class mlb():
 
         tables_games_results = self.soup_games.find_all('table')
         self.dic_games = {}
+        self.url_stats = []
 
         if tables_games_results:
             self.table = self.soup_games.find_all('table')[0] 
@@ -33,7 +48,6 @@ class mlb():
             self.tds = self.table.find_all('td', attrs={'class': 'teams__col Table__TD'})
 
             self.len = len(self.divs_team1)
-            self.url_stats.clear()#Cleaning the previous data in the list self.url_stats
 
             j = 0 #for iterate tds elements
             for i in range(self.len):
@@ -55,9 +69,20 @@ class mlb():
                     self.dic_games[f'Game_{i}'] = self.list_data_game
 
                 else: 
-                    result = self.tds[j].find('a').text
-                    self.list_data_game.append(result)
+                    
+                    self.list_data_game.append(game_result)
 
+                    #--------- Geting the score and Nick Names for team1 and team2 -------
+                    self.list_results = game_result.split(',')
+                    
+                    self.result_team1 =  re.search("\d+", self.list_results[0]).group()
+                    self.result_team2 =  re.search("\d+", self.list_results[1]).group()
+                    
+                    self.nickname_team1 =  re.search("\w+", self.list_results[0]).group()
+                    self.nickname_team2 =  re.search("\w+", self.list_results[1]).group()
+                    #-------------------------------------------------------------------
+                    
+                    #Getting the tag a element for the Pitcher who won and who loss
                     win = self.tds[j + 1].find('a')
                     loss = self.tds[j + 2].find('a')
 
@@ -71,35 +96,65 @@ class mlb():
                         win = ''
                         self.list_data_game.append(win)
                         self.list_data_game.append(loss.text)
+
+                        if int(self.result_team1) > int(self.result_team2):
+                            name_team1 = self.dic_team_nikname[self.nickname_team1]
+                            id_team_winner = self.dic_team_name_id[name_team1]
+                        else:
+                            name_team2 = self.dic_team_nikname[self.nickname_team2]
+                            id_team_winner = self.dic_team_name_id[name_team2]
+                        
+                        id_pitch_losser = self.tds[j + 2].find('a').get('href').split('/')[-1]
+                        url_pitch_losser_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch_losser}/teamId/{id_team_winner}'
+                        self.url_stats.append(url_pitch_losser_stats)
                         self.dic_games[f'Game_{i}'] = self.list_data_game
-                        # id_pitch2 = self.tds[j + 2].find('a').get('href').split('/')[-1]
-                        # id_team1 = self.dic_team_name_id[team1]
-                        # url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
-                        # self.url_stats.append(url_pitch2_stats)
                     
                     elif loss == None:
                         loss = ''
                         self.list_data_game.append(win.text)
                         self.list_data_game.append(loss)
+
+                        if int(self.result_team1) > int(self.result_team2):
+                            name_team2 = self.dic_team_nikname[self.nickname_team2]
+                            id_team_losser = self.dic_team_name_id[name_team2]
+                        else:
+                            name_team1 = self.dic_team_nikname[self.nickname_team1]
+                            id_team_losser = self.dic_team_name_id[name_team1]
+
+                        id_pitch_winner = self.tds[j + 1].find('a').get('href').split('/')[-1]
+                        url_pitch_winner_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch_winner}/teamId/{id_team_losser}'
+                        self.url_stats.append(url_pitch_winner_stats)
                         self.dic_games[f'Game_{i}'] = self.list_data_game
                     
                     else:
                         self.list_data_game.append(win.text)
                         self.list_data_game.append(loss.text)
+                        
+                        if int(self.result_team1) > int(self.result_team2):
+                            name_team1 = self.dic_team_nikname[self.nickname_team1]
+                            id_team_winner = self.dic_team_name_id[name_team1]
+                            name_team2 = self.dic_team_nikname[self.nickname_team2]
+                            id_team_losser = self.dic_team_name_id[name_team2]
+                        else:
+                            name_team1 = self.dic_team_nikname[self.nickname_team1]
+                            id_team_losser = self.dic_team_name_id[name_team1]
+                            name_team2 = self.dic_team_nikname[self.nickname_team2]
+                            id_team_winner = self.dic_team_name_id[name_team2]
+
                         self.dic_games[f'Game_{i}'] = self.list_data_game
 
-                        id_pitch1 = self.tds[j + 1].find('a').get('href').split('/')[-1]
-                        id_team1 = self.dic_team_name_id[team1]
-                        id_pitch2 = self.tds[j + 2].find('a').get('href').split('/')[-1]
-                        id_team2 = self.dic_team_name_id[team2]
+                        id_pitch_winner = self.tds[j + 1].find('a').get('href').split('/')[-1]
+                        id_pitch_losser = self.tds[j + 2].find('a').get('href').split('/')[-1]
                         
-                        url_pitch1_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch1}/teamId/{id_team2}'
-                        self.url_stats.append(url_pitch1_stats)
-                        url_pitch2_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch2}/teamId/{id_team1}'
-                        self.url_stats.append(url_pitch2_stats)
+                        url_pitch_winner_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch_winner}/teamId/{id_team_losser}'
+                        self.url_stats.append(url_pitch_winner_stats)
+                        url_pitch_losser_stats = f'https://www.espn.com/mlb/player/batvspitch/_/id/{id_pitch_losser}/teamId/{id_team_winner}'
+                        self.url_stats.append(url_pitch_losser_stats)
 
                 j += 4 #For acces to the td that is in the next row of the table for next lap of the loop
-            
+        
+        self.dic_games['urls_stats'] = self.url_stats
+        
         return self.dic_games
 
     def get_games(self, date):        
@@ -184,16 +239,6 @@ class mlb():
         self.dic_games['urls_stats'] = self.url_sts_games
         return self.dic_games
 
-    def create_dic_team_id(self):
-        self.dic_team_name_id = {}
-        with open('team_id.txt', 'r') as file:
-            for line in file:
-                line = line.split(':')
-                self.team_name = line[0]
-                self.team_id = line[1].replace('\n', '')
-                self.dic_team_name_id[self.team_name] = self.team_id
-        
-        return self.dic_team_name_id
 
     def get_stats(self, url_stats):
         #Bellow is an example url format that this function need to receive
@@ -230,18 +275,18 @@ if __name__ == '__main__':
     mlb1 =  mlb()
 
     # date =  datetime.datetime.now().strftime('%Y%m%d')
-    # games = mlb1.get_games_results('20220201') #20220527 20220423
+    games = mlb1.get_games_results('20220428') #20220527 20220423
     # for game in games:
     #     print(games[game])
 
     # print('The URLS list for the statistics are bellow:')
     # print(mlb1.url_stats)
     
-    urls = ['https://www.espn.com/mlb/player/batvspitch/_/id/40921/david-peterson']
+    # urls = ['https://www.espn.com/mlb/player/batvspitch/_/id/40921/david-peterson']
 
-    stats = mlb1.get_stats(urls)
+    # stats = mlb1.get_stats(urls)
 
-    print(stats)
+    # print(stats)
     
 
 #===================================================================================================================================

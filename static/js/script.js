@@ -156,33 +156,37 @@ get_games(dateToSend, '/get_games').then(result => {showGames(result)})
 
 //------------------------- Displaying the Games Results in the web page ------------------------------------
 function showGamesResults (games) {
+    const urls_stats = games['urls_stats']
+    let team1, team2, result, win, loss
     const fragment = document.createDocumentFragment()
     for(key in games){
-        let [team1, team2, result, win, loss] = games[key]
-        const tr = document.createElement('tr')
-        
-        if(team1.includes('-')){
-            team1 = changeToUpperCase(team1)
-        }else{
-            const firstLetter = team1.charAt(0).toUpperCase()
-            team1 = firstLetter + team1.slice(1)
+        if(key !== 'urls_stats'){
+            let [team1, team2, result, win, loss] = games[key]
+            const tr = document.createElement('tr')
+            
+            if(team1.includes('-')){
+                team1 = changeToUpperCase(team1)
+            }else{
+                const firstLetter = team1.charAt(0).toUpperCase()
+                team1 = firstLetter + team1.slice(1)
+            }
+            
+            if(team2.includes('-')){
+                team2 = changeToUpperCase(team2)
+            }else{
+                const firstLetter = team1.charAt(0).toUpperCase()
+                team1 = firstLetter + team1.slice(1)
+            }
+    
+            tr.innerHTML = `
+                <td>${team1}</td>
+                <td>${team2}</td>
+                <td>${result}</td>
+                <td>${win}</td>
+                <td>${loss}</td>
+            `
+            fragment.appendChild(tr)
         }
-        
-        if(team2.includes('-')){
-            team2 = changeToUpperCase(team2)
-        }else{
-            const firstLetter = team1.charAt(0).toUpperCase()
-            team1 = firstLetter + team1.slice(1)
-        }
-
-        tr.innerHTML = `
-            <td>${team1}</td>
-            <td>${team2}</td>
-            <td>${result}</td>
-            <td>${win}</td>
-            <td>${loss}</td>
-        `
-        fragment.appendChild(tr)
     }
     tbodyGamesResults.appendChild(fragment)
 
@@ -190,7 +194,7 @@ function showGamesResults (games) {
     animation.classList.toggle('hide')
     
     // calling the function that request to the backend for pitchersvsbatter stats
-    getStats().then(result => showStats(result))
+    getStats(urls_stats).then(result => showStats(result))
 }
 
 
