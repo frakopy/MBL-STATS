@@ -21,15 +21,23 @@ const tbodyGamesResults = document.getElementById('tbody-games-results')
 
 //-------------------- Displaying the statistics in the web page ----------------------------------
 function showStats (sts) {
+    
+    //convert the object in array of objects for use sort method and later order by id
+    const arrayObjects = Object.keys(sts).map(key => { 
+        return sts[key];
+    })
+
+    arrayObjects.sort((a, b) => a.id - b.id) //Order the array of Objects
+    
     const fragment = document.createDocumentFragment()
-    for(key in sts) {
+    for(const obj of arrayObjects) {
         const h2 =  document.createElement('h2')
-        h2.textContent = key
+        h2.textContent = obj.title
         fragment.appendChild(h2)
 
         const divTable = document.createElement('div')
         divTable.classList.add('table-sts')
-        divTable.innerHTML = `${sts[key]}`
+        divTable.innerHTML = `${obj.stats_data}`
         fragment.appendChild(divTable)
 
     }
@@ -110,9 +118,6 @@ function showGames (games) {
     // calling the function that request to the backend for pitchersvsbatter stats
     getStats(urls_stats).then(result => showStats(result))
 
-    // setTimeout(() => { 
-    //     getStats().then(result => showStats(result))
-    // }, 50000) 
 }
 
 
