@@ -254,6 +254,8 @@ class mlb():
                 self.df_stats = pd.read_html(self.webpage)
 
                 self.html_table = tabulate(self.df_stats[1], headers='keys', tablefmt='html', floatfmt=".3f")
+                self.html_table = re.sub(r'0\.', '.', str(self.html_table))
+                # print(self.html_table)
 
                 self.stats_title = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}) #For avoid HTPP Erro 403 Forbidden we use headers parameter
                 self.soup_sts =  BeautifulSoup(self.stats_title.text, 'html.parser')
@@ -262,6 +264,7 @@ class mlb():
                 self.dic_stats[f'sts{i}'] = {'title': self.title, 'stats_data': self.html_table, 'id': i}
 
             except Exception as e:
+                self.dic_stats[f'sts{i}'] = {'title': 'There is no data available', 'stats_data': '', 'id': i}
                 print(e)
                 continue
 
@@ -275,16 +278,16 @@ if __name__ == '__main__':
     mlb1 =  mlb()
 
     # date =  datetime.datetime.now().strftime('%Y%m%d')
-    games = mlb1.get_games_results('20220428') #20220527 20220423
+    # games = mlb1.get_games_results('20220428') #20220527 20220423
     # for game in games:
     #     print(games[game])
 
     # print('The URLS list for the statistics are bellow:')
     # print(mlb1.url_stats)
     
-    # urls = ['https://www.espn.com/mlb/player/batvspitch/_/id/40921/david-peterson']
+    urls = ['https://www.espn.com/mlb/player/batvspitch/_/id/40921/david-peterson']
 
-    # stats = mlb1.get_stats(urls)
+    stats = mlb1.get_stats(urls)
 
     # print(stats)
     
